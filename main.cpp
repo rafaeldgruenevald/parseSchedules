@@ -1,9 +1,9 @@
 /*
-Os arquivos Comma-separated values, tamb√©m conhecido como CSV, s√£o arquivos de texto de formato regulamentado pelo RFC 4180[1], que faz uma ordena√ß√£o de bytes separando valores atrav√©s de um delimitador (v√≠rgulas, ponto-e-v√≠rgula ou tabula√ß√£o) [2].
-Este formato √© utilizado por v√°rios aplicativos, tipicamente ferramentas de escrit√≥rio. Microsoft Excel e LibreOffice Calc podem exportar/importar dados de suas planilhas neste formato.
-Um arquivo CSV abriga um sem n√∫mero de "registros", separados por quebras de linha (cada "registro" permanece numa linha do arquivo) e cada registro possui um ou mais "campos", separados por um delimitador, os mais comuns sendo a v√≠rgula (","), o ponto e v√≠rgula (";") e o caractere "tab" (\t).
-Arquivos separados por v√≠rgula e ponto e v√≠rgula normalmente recebem a extens√£o "CSV" e arquivos separados por "tab" a extens√£o "TSV". H√° tamb√©m bases de dados nesses formatos que recebem a extens√£o "TXT". 
-Arquivos CSV s√£o simples e funcionam na maior parte das aplica√ß√µes que lidam com dados estruturados.
+Os arquivos Comma-separated values, tambÈm conhecido como CSV, s„o arquivos de texto de formato regulamentado pelo RFC 4180[1], que faz uma ordenaÁ„o de bytes separando valores atravÈs de um delimitador (vÌrgulas, ponto-e-vÌrgula ou tabulaÁ„o) [2].
+Este formato È utilizado por v·rios aplicativos, tipicamente ferramentas de escritÛrio. Microsoft Excel e LibreOffice Calc podem exportar/importar dados de suas planilhas neste formato.
+Um arquivo CSV abriga um sem n˙mero de "registros", separados por quebras de linha (cada "registro" permanece numa linha do arquivo) e cada registro possui um ou mais "campos", separados por um delimitador, os mais comuns sendo a vÌrgula (","), o ponto e vÌrgula (";") e o caractere "tab" (\t).
+Arquivos separados por vÌrgula e ponto e vÌrgula normalmente recebem a extens„o "CSV" e arquivos separados por "tab" a extens„o "TSV". H· tambÈm bases de dados nesses formatos que recebem a extens„o "TXT".
+Arquivos CSV s„o simples e funcionam na maior parte das aplicaÁıes que lidam com dados estruturados.
 */
 
 #include <ios>
@@ -21,9 +21,13 @@ int main(int argc, char* argv[]) {
   std::ifstream inHorario;
   std::ifstream inAlocacao;
   std::unordered_map<std::string, std::string> labs;
-  std::string delimitador = ",";
+  std::unordered_map<std::string, int> ordem;
+  std::string aula;
+  std::string lab;
   std::string hora;
-  int contador;
+  std::string delimitador = ",";
+  int contador, ord = 0;
+  int clinha = 0;
   char linha[MAXCHAR];
   setlocale(LC_ALL,"");
 
@@ -38,6 +42,47 @@ int main(int argc, char* argv[]) {
     std::cerr << "Arquivo " << argv[2] << " nao pode ser aberto!" << std::endl;
   }
 
+  while (inAlocacao.getline(linha, MAXCHAR)) {
+    std::string strLinha(linha);
+    contador = 0;
+    if (clinha < 3) {
+        clinha++;
+    }
+
+    while(contador < 3) {
+        std::string campo = strLinha.substr(0, strLinha.find(delimitador));
+        switch (contador) {
+        case 0:
+            if (campo[campo.length() - 1] == ' ') {
+                campo.erase((campo.length() - 1), 1);
+            }
+            aula = campo;
+            //std::cout << campo;
+            break;
+        case 2:
+            if (campo[0] == ' ') {
+                campo.erase(0,1);
+            }
+            lab = campo;
+            //std::cout << campo;
+            break;
+        default:
+            break;
+        }
+
+        strLinha.erase(0, strLinha.find(delimitador) + delimitador.length());
+        contador++;
+    }
+    //std::cout << std::endl;
+    labs[aula] = lab;
+    if (ordem.find(lab) == ordem.end() && clinha > 2) {
+        ordem[lab] = ord;
+        ord++;
+        std::cout << lab << " "<< ordem[lab] << std::endl;
+    }
+  }
+
+  /*
   labs["INTRO"] = "2 Tro Geral";
   labs["TROFUN"] = "2 Tro Geral";
   labs["DESEN"] = "3 Tro Geral";
@@ -53,8 +98,11 @@ int main(int argc, char* argv[]) {
   labs["TCC"] = "INFO. 7";
   labs["SINAIS"] = "6 Proc. Sinais";
   labs["AUTOM"] = "14 Automacao";
+  */
 
   // lendo cada linha dos horarios
+
+  /*
   while(inHorario.getline(linha, MAXCHAR)) {
     // zera o contador
     contador = 0;
@@ -82,6 +130,7 @@ int main(int argc, char* argv[]) {
     }
     std::cout << std::endl;
   }
+  */
   inHorario.close();
   inAlocacao.close();
 }
