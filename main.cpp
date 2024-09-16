@@ -112,43 +112,7 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  /*
-  labs["INTRO"] = "2 Tro Geral";
-  labs["TROFUN"] = "2 Tro Geral";
-  labs["DESEN"] = "3 Tro Geral";
-  labs["DIGIT"] = "6 Proc. Sinais";
-  labs["PROJ INIC CIENT"] = "INFO. 7";
-  labs["ELEM"] = "INFO. 7";
-  labs["SIST M"] = "9 Micros";
-  labs["SISCOM"] = "11 Comunicacoes";
-  labs["TROANL"] = "1 Tro Geral";
-  labs["ACIONA"] = "10 Acionamentos";
-  labs["SIST MICRO II"] = "9 Micros";
-  labs["TROPOT"] = "13 Potencia";
-  labs["TCC"] = "INFO. 7";
-  labs["SINAIS"] = "6 Proc. Sinais";
-  labs["AUTOM"] = "14 Automacao";
-  */
-
-  /*
-  std::cout << labs["INTRO"] << std::endl;
-  std::cout << labs["TROFUN"] << std::endl;
-  std::cout << labs["DESEN"] << std::endl;
-  std::cout << labs["DIGIT"] << std::endl;
-  std::cout << labs["PROJ INIC CIENT"] << std::endl;
-  std::cout << labs["ELEM"] << std::endl;
-  std::cout << labs["SIST M"] << std::endl;
-  std::cout << labs["SISCOM"] << std::endl;
-  std::cout << labs["TROANL"] << std::endl;
-  std::cout << labs["ACIONA"] << std::endl;
-  std::cout << labs["SIST MICRO II"] << std::endl;
-  std::cout << labs["TROPOT"] << std::endl;
-  std::cout << labs["TCC"] << std::endl;
-  std::cout << labs["SINAIS"] << std::endl;
-  std::cout << labs["AUTOM"] << std::endl;
-  */
   // lendo cada linha dos horarios
-
   while(inHorario.getline(linha, MAXCHAR)) {
     // zera o contador
     contador = 0;
