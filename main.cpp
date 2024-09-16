@@ -10,25 +10,40 @@ Arquivos CSV são simples e funcionam na maior parte das aplicações que lidam com
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <iterator>
 #include <ostream>
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 #define MAXCHAR 200
+#define COLUNAS 6
+#define LINHAS 180
 
 // Pega argumentos do terminal
 int main(int argc, char* argv[]) {
   std::ifstream inHorario;
   std::ifstream inAlocacao;
+  std::ofstream outFile;
+
   std::unordered_map<std::string, std::string> labs;
   std::unordered_map<std::string, int> ordem;
+
+  std::vector<std::vector<std::string>> out(LINHAS, std::vector<std::string>(COLUNAS));
+
+  std::string delimitadorCSV = ",";
+  std::string delimitadorESP = " ";
+
   std::string aula;
   std::string lab;
   std::string hora;
-  std::string delimitador = ",";
+
+  char linha[MAXCHAR];
+  std::string horas[] = {"07:30", "08:20", "09:10", "10:20", "11:10", "13:10", "14:00", "14:50", "16:00", "16:50", "17:40"};
+
   int contador, ord = 0;
   int clinha = 0;
-  char linha[MAXCHAR];
+
   setlocale(LC_ALL,"");
 
   // abrindo arquivo horario
@@ -42,6 +57,12 @@ int main(int argc, char* argv[]) {
     std::cerr << "Arquivo " << argv[2] << " nao pode ser aberto!" << std::endl;
   }
 
+  // abrindo o arquivo de saida
+  outFile.open(argv[3], std::ios::out); 
+  if (! outFile) { std::cout << "Arquivo " << argv[3] << " não pode ser aberto" << std::endl;
+    return -1;
+  }
+
   while (inAlocacao.getline(linha, MAXCHAR)) {
     std::string strLinha(linha);
     contador = 0;
@@ -50,10 +71,10 @@ int main(int argc, char* argv[]) {
     }
 
     while(contador < 3) {
-        std::string campo = strLinha.substr(0, strLinha.find(delimitador));
+        std::string campo = strLinha.substr(0, strLinha.find(delimitadorCSV));
         switch (contador) {
         case 0:
-            if (campo[campo.length() - 1] == ' ') {
+            if (*campo.rbegin() == ' ') {
                 campo.erase((campo.length() - 1), 1);
             }
             aula = campo;
@@ -70,15 +91,24 @@ int main(int argc, char* argv[]) {
             break;
         }
 
-        strLinha.erase(0, strLinha.find(delimitador) + delimitador.length());
+        strLinha.erase(0, strLinha.find(delimitadorCSV) + delimitadorCSV.length());
         contador++;
     }
     //std::cout << std::endl;
     labs[aula] = lab;
     if (ordem.find(lab) == ordem.end() && clinha > 2) {
+        out[ord * 15][0] = lab + delimitadorCSV;
+        out[(ord * 15) + 2][0] = delimitadorCSV + "Segunda" + delimitadorCSV;
+        out[(ord * 15) + 2][1] = "Terça" + delimitadorCSV;
+        out[(ord * 15) + 2][2] = "Quarta" + delimitadorCSV;
+        out[(ord * 15) + 2][3] = "Quinta" + delimitadorCSV;
+        out[(ord * 15) + 2][4] = "Sexta";
+        for (int i = 1; i <= 11; i++) {
+            out[((ord * 15) + 2) + i][0] = horas[i - 1] + delimitadorCSV;
+        }
         ordem[lab] = ord;
         ord++;
-        std::cout << lab << " "<< ordem[lab] << std::endl;
+        //std::cout << lab << std::endl;
     }
   }
 
@@ -100,37 +130,87 @@ int main(int argc, char* argv[]) {
   labs["AUTOM"] = "14 Automacao";
   */
 
+  /*
+  std::cout << labs["INTRO"] << std::endl;
+  std::cout << labs["TROFUN"] << std::endl;
+  std::cout << labs["DESEN"] << std::endl;
+  std::cout << labs["DIGIT"] << std::endl;
+  std::cout << labs["PROJ INIC CIENT"] << std::endl;
+  std::cout << labs["ELEM"] << std::endl;
+  std::cout << labs["SIST M"] << std::endl;
+  std::cout << labs["SISCOM"] << std::endl;
+  std::cout << labs["TROANL"] << std::endl;
+  std::cout << labs["ACIONA"] << std::endl;
+  std::cout << labs["SIST MICRO II"] << std::endl;
+  std::cout << labs["TROPOT"] << std::endl;
+  std::cout << labs["TCC"] << std::endl;
+  std::cout << labs["SINAIS"] << std::endl;
+  std::cout << labs["AUTOM"] << std::endl;
+  */
   // lendo cada linha dos horarios
 
-  /*
   while(inHorario.getline(linha, MAXCHAR)) {
     // zera o contador
     contador = 0;
     // converte uma array de chars para um objeto string
     std::string strLinha(linha);
     // procura pela primeira ocorrencia do dilimitador na linha, caso nao exista retorna 'npos'
+    int posHora = 0;
+    std::string aula;
     while(contador < 6) {
-      std::string campo = strLinha.substr(0, strLinha.find(delimitador));
+      std::string campo = strLinha.substr(0, strLinha.find(delimitadorCSV));
       if (contador == 0) {
-        hora = campo;
+        for (int i = 1; i <= 11; i++) {
+          if (campo == horas[i]) {
+            posHora = i;
+            break;
+          }
+        }
       } else {
         if (contador == 5) {
           campo = strLinha;
           strLinha = "";
         }
-        std::string aula = campo.substr(0, campo.find(" "));
-        if (labs.find(aula) != labs.end()) {
-          std::cout << labs[aula] << " ";
-        } else {
-          std::cout << campo << " ";
+        aula = campo.substr(0, campo.find(" "));
+        if (labs.find(aula) == labs.end()) {
+          aula = campo.substr(0, campo.find(" ")) + " ";
+          campo.erase(0, campo.find(delimitadorESP) + delimitadorESP.length());
+          while (campo.find(delimitadorESP) != std::string::npos) {
+            aula += campo.substr(0, campo.find(" "));
+            if (labs.find(aula) != labs.end()) break; 
+            aula += " ";
+            campo.erase(0, campo.find(delimitadorESP) + delimitadorESP.length());
+          }
+          std::cout << aula << std::endl;
+        }
+        if (labs.find(aula) != labs.end() && aula != "") {
+          int ord = (((ordem[labs[aula]] * 15) + 3) + posHora);
+          //std::cout << ord << " " << contador << " " << aula << std::endl;
+          if (out[ord][contador] != "") {
+            out[ord][contador] = aula + " / " + out[ord][contador];
+          } else {
+            out[ord][contador] = aula + delimitadorCSV;
+          }
         }
       }
-      strLinha.erase(0, strLinha.find(delimitador) + delimitador.length());
+      strLinha.erase(0, strLinha.find(delimitadorCSV) + delimitadorCSV.length());
       contador++;
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
   }
-  */
+  // escrevendo no arquivo de saida
+
+  for (int i = 0; i < LINHAS; i++) {
+    for (int j = 0; j < COLUNAS; j++) {
+      if (out[i][j] != "") {
+        outFile << out[i][j];
+      } else if (j < 5){
+        outFile << delimitadorCSV;
+      }
+    }
+    outFile << '\n';
+  }
   inHorario.close();
   inAlocacao.close();
+  outFile.close();
 }
